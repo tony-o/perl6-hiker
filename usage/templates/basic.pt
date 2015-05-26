@@ -1,0 +1,7 @@
+Hello <% print "WORLD!"; %>
+
+Oh, did you want variables too?  I can do <% print $data<what>; %> too.
+
+<% for ^3 { %>
+<% print $_ ~ ($_ == 2 ?? '' !! ', '); %>
+<% } %>
