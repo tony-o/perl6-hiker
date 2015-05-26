@@ -2,9 +2,9 @@
 
 use lib 'lib';
 use lib '../perl6-http-server-threaded-router/lib';
-use Piker;
+use Hiker;
 
-my $app = Piker.new(dirs => ['usage']);
+my $app = Hiker.new(dirs => ['usage']);
 
 $app.bind;
 

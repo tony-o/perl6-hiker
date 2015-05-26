@@ -1,6 +1,6 @@
-use Piker::Route;
+use Hiker::Route;
 
-class MyApp::Basic does Piker::Route {
+class MyApp::Basic does Hiker::Route {
   has $.path = '/';
 
   method handler($req, $res) {

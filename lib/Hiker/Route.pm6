@@ -1,3 +1,3 @@
-role Piker::Route {
+role Hiker::Route {
   method handler($req, $res) {*}
 }

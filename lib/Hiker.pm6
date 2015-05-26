@@ -1,10 +1,10 @@
 use HTTP::Server::Threaded;
 use HTTP::Server::Threaded::Router;
 
-use Piker::Model;
-use Piker::Route;
+use Hiker::Model;
+use Hiker::Route;
 
-class Piker {
+class Hiker {
   has Str  $.host;
   has Int  $.port;
   has Bool $.autobind;
@@ -30,21 +30,18 @@ class Piker {
       try {
         for $d.IO.dir.grep(/ ('.pm6' | '.pl6') $$ /) -> $f {
           try {
-            say "{@ignore.perl} vs {GLOBAL::.values.map({.WHO.values}).list.perl}";
             require $f;
-            say "{@ignore.perl} vs {GLOBAL::.values.map({.WHO.values}).list.perl}";
             for GLOBAL::.values.map({.WHO.values}).list.grep({ $_.WHICH !~~ any @ignore.map({.WHICH}) }) -> $module {
-              $module.perl.say;
               @ignore.push($module);
               "==> Binding {$module.perl} ...".say;
               try { 
                 my $obj = $module.new;
-                if $obj.^does(Piker::Model) {
+                if $obj.^does(Hiker::Model) {
                   #something
                 }
-                if $obj.^does(Piker::Route) {
+                if $obj.^does(Hiker::Route) {
                   die "{$module.perl} does not contain .path" unless $obj.path;
-                  "==> Setting up route {$obj.path}".say;
+                  "==> Setting up route {$obj.path} ($f)".say;
                   route $obj.path, sub ($req,$res) {
                     $obj.handler($req, $res);;
                   }
