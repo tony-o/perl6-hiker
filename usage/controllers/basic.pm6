@@ -5,7 +5,6 @@ class MyApp::Basic does Hiker::Route {
   has $.template = 'basic.pt';
 
   method handler($req, $res) {
-    'i do some controller stuff here'.say;
-    $res.data.say;
+    $res.data<what> = 'variables';
   }
 }
