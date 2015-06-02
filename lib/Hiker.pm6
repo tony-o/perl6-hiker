@@ -1,5 +1,5 @@
 use HTTP::Server::Threaded;
-use HTTP::Server::Threaded::Router;
+use HTTP::Server::Router;
 
 use Hiker::Model;
 use Hiker::Route;
