@@ -70,4 +70,15 @@ class MyApp::Model does Hiker::Model {
 - The routes are run through until a `True` (or a Promise whose result is `True`) value is returned
 - The template specified by the controller is rendered and the result is sent to the client
 
+##Templates
+
+`Hiker` uses `Template::Protone` for the time being.  `Template::Protone` reduces the templates to `sub`s.  If the `.template` specified by the route doesn't exist then a default `404` message is shown to the user.
+
+For the time being this isn't configurable
+
+##Stuff to do
+
+- Allow for custom templating engines
+- Whatever else the people crave
+
 
