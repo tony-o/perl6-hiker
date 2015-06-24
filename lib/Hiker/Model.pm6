@@ -1,3 +1,3 @@
 role Hiker::Model {
-  method retrieve($id?) {*}
+  method bind($req, $res) {*}
 }

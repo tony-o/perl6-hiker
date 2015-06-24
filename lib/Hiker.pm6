@@ -25,52 +25,77 @@ class Hiker {
 
   method bind {
     my @ignore;
-    for GLOBAL::.values {
-      @ignore.push($_.WHO.values);
+    my @routes;
+    my $recurse = sub (*@m) {
+      my @r;
+      for @m -> $m {
+        @r.push($m) unless @ignore.grep($m) || ::($m.^name) !~~ any(Hiker::Route, Hiker::Model);
+        try @r.push($recurse($m.WHO.values)) if $m.WHO.values.elems;
+      }
+      return @r.flat;
+    };
+    for @($recurse(GLOBAL::.values)) {
+      @ignore.push($_);
     }
     for @!controllers -> $d {
       try {
         for $d.IO.dir.grep(/ ('.pm6' | '.pl6') $$ /) -> $f {
           try {
             require $f;
-            for GLOBAL::.values.map({.WHO.values}).list.grep({ $_.WHICH !~~ any @ignore.map({.WHICH}) }) -> $module {
+            my @globmods = $recurse(GLOBAL::.values);
+            for @globmods -> $module {  
               @ignore.push($module);
               try {
-                "==> Binding {$module.perl} ...".say;
-                my $obj = $module.new;
-                if $obj.^does(Hiker::Model) {
-                  #something
-                }
-                if $obj.^does(Hiker::Route) {
-                  die "{$module.perl} does not contain .path" unless $obj.path;
-                  "==> Setting up route {$obj.path} ($f)".say;
-                  my $template = $obj.template;
-                  route $obj.path, sub ($req, $res) {
-                    CATCH { default {
-                      "==> Failed to serve {$req.resource}".say;
-                      $_.Str.lines.map({ "\t$_".say; });
-                      $_.backtrace.Str.lines.map({ "\t$_".say; });
-                    } }
-                    $res does Hiker::Render;
-                    $res.req = $req;
-                    $res.template = $*SPEC.catpath('', $.templates, $template);
-                    my $lval = $obj.handler($req, $res);
-                    return False if $res.rendered;
-                    $res.render if so $lval && !so $res.rendered;
-                    $lval;
-                  }
-                }
-                CATCH { default {
-                  "==> Failed to bind {$module.perl}".say;
-                  $_.Str.lines.map({ "\t$_".say; });
-                  $_.backtrace.Str.lines.map({ "\t$_".say; });
-                } }
-              } 
+                next if ::($module.^name) ~~ Failure;
+                @routes.push($f.Str => $module);
+              }
             }
-            CATCH { default { say $_; } }
           }
         }
       }
+    }
+    my $weight = sub ($_) {
+      $_.value.new.path ~~ Regex ?? 1 !!
+        $_.value.new.path.Str.index(':') ?? 0 !!
+          -1;
+    };
+    @routes .=sort({ 
+      $weight($^x) cmp $weight($^y);
+    });
+    for @routes {
+      my ($f, $module) = $_.kv;
+      try {
+        "==> Binding {$module.perl} ...".say;
+        my $obj = $module.new;
+        if $obj ~~ Hiker::Route {
+          die "{$module.perl} does not contain .path" unless $obj.path.defined;
+          die "{$module.perl} requests model {$obj.model}" if $obj.^attributes.grep(.gist eq 'model') && ::($obj.model) ~~ Failure;
+          "==> Setting up route {$obj.path ~~ Regex ?? $obj.path.gist !! $obj.path} ($f)".say;
+          my $template = $obj.template;
+          route $obj.path, sub ($req, $res) {
+            "==> Serving {$req.uri} with {$f} :: {$module.^name}[{$obj.path ~~ Regex ?? $obj.path.gist !! $obj.path}]".say;
+            CATCH { default {
+              "==> Failed to serve {$req.resource}".say;
+              $_.Str.lines.map({ "\t$_".say; });
+              $_.backtrace.Str.lines.map({ "\t$_".say; });
+            } }
+            $res does Hiker::Render unless $res ~~ Hiker::Render;
+            $res.req = $req;
+            $res.template = $*SPEC.catpath('', $.templates, $template);
+            my $lval = $obj.handler($req, $res);
+            await $lval if $lval ~~ Promise;
+            $lval = $lval.status.result if $lval ~~ Promise;
+            return True if $res.rendered;
+            $res.render if $lval && !so $res.rendered;
+            return $lval;
+          }
+        }
+        CATCH { default {
+          "==> Failed to bind {$module.perl}".say;
+          $_.Str.lines.map({ "\t$_".say; });
+          $_.backtrace.Str.lines.map({ "\t$_".say; });
+        } }
+      } 
     }
   }
 
