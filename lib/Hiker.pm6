@@ -47,7 +47,7 @@ class Hiker {
               @ignore.push($module);
               try {
                 next if ::($module.^name) ~~ Failure;
-                @routes.push($f.Str => $module);
+                @routes.push($f.Str => $module) if $module.^can('path');
               }
             }
           }
@@ -72,15 +72,23 @@ class Hiker {
           die "{$module.perl} requests model {$obj.model}" if $obj.^attributes.grep(.gist eq 'model') && ::($obj.model) ~~ Failure;
           "==> Setting up route {$obj.path ~~ Regex ?? $obj.path.gist !! $obj.path} ($f)".say;
           my $template = $obj.template;
+          my $model;
+          try {
+            $model = ::($obj.model).new;
+          }
           route $obj.path, sub ($req, $res) {
             "==> Serving {$req.uri} with {$f} :: {$module.^name}[{$obj.path ~~ Regex ?? $obj.path.gist !! $obj.path}]".say;
             CATCH { default {
-              "==> Failed to serve {$req.resource}".say;
+              "==> Failed to serve {$req.uri}".say;
               $_.Str.lines.map({ "\t$_".say; });
               $_.backtrace.Str.lines.map({ "\t$_".say; });
             } }
             $res does Hiker::Render unless $res ~~ Hiker::Render;
             $res.req = $req;
+            try {
+              CATCH { default { .say; } }
+              $model.bind($req, $res) if $model.defined;
+            }
             $res.template = $*SPEC.catpath('', $.templates, $template);
             my $lval = $obj.handler($req, $res);
             await $lval if $lval ~~ Promise;
