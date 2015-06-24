@@ -38,7 +38,7 @@ use Hiker::Route;
 
 class MyApp::Basic does Hiker::Route {
   has $.path     = '/'; # can also be a regex, eg: /.+/
-  has $.template = '/routes/basic.pt';
+  has $.template = 'basic.pt';
   has $.model    = 'MyApp::Model'; #this is an optional attribute
 
   method handler($req, $res) {
@@ -63,6 +63,14 @@ class MyApp::Model does Hiker::Model {
 }
 ```
 
+##Boilerplate
+
+```
+# hiker init
+```
+
+This will create a boilerplate application for you in the current directory
+
 ##Request Flow
 
 - Request is received
@@ -79,6 +87,7 @@ For the time being this isn't configurable
 ##Stuff to do
 
 - Allow for custom templating engines
+- Add a `weight` attribute to the routes so Regex order can be handled better
 - Whatever else the people crave
 
 
