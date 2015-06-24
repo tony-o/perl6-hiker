@@ -37,7 +37,7 @@ This role lets `Hiker` know what this class does.  Boilerplate class (controller
 use Hiker::Route;
 
 class MyApp::Basic does Hiker::Route {
-  has $.path     = '/';
+  has $.path     = '/'; # can also be a regex, eg: /.+/
   has $.template = '/routes/basic.pt';
   has $.model    = 'MyApp::Model'; #this is an optional attribute
 
