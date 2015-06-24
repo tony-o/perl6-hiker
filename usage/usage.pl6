@@ -5,8 +5,8 @@ use lib '../../perl6-http-server-threaded-router/lib';
 use Hiker;
 
 my $app = Hiker.new(
-  controllers => ['controllers', 'models'],
-  templates   => 'templates',
+  hikes     => ['controllers', 'models'],
+  templates => 'templates',
 );
 
 $app.listen;

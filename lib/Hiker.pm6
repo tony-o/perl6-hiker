@@ -10,10 +10,10 @@ class Hiker {
   has Int  $.port;
   has Bool $.autobind;
   has      $.server;
-  has      @!controllers;
+  has      @!hikes;
   has      $.templates;
 
-  submethod BUILD(:$!host? = '127.0.0.1', :$!port? = 8080, :@!controllers? = @('lib'), :$!autobind? = True, :$!server?, Str :$!templates = 'templates') {
+  submethod BUILD(:$!host? = '127.0.0.1', :$!port? = 8080, :@!hikes? = @('lib'), :$!autobind? = True, :$!server?, Str :$!templates = 'templates') {
     if $!server !~~ HTTP::Server::Threaded {
       $!server = HTTP::Server::Threaded.new(:ip($!host), :$!port);
     }
@@ -37,7 +37,7 @@ class Hiker {
     for @($recurse(GLOBAL::.values)) {
       @ignore.push($_);
     }
-    for @!controllers -> $d {
+    for @!hikes -> $d {
       try {
         for $d.IO.dir.grep(/ ('.pm6' | '.pl6') $$ /) -> $f {
           try {
