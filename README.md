@@ -1,5 +1,7 @@
 #hiker
 
+[![Build Status](https://travis-ci.org/tony-o/perl6-hiker.svg)](https://travis-ci.org/tony-o/perl6-hiker)
+
 ##usage
 
 ```perl6
