@@ -1,4 +1,5 @@
 {
+  "perl" : "6.*",
   "name" : "Hiker",
   "version" : "0.1",
   "description" : "MVC Framework built on HTTP::Server HTTP::Server::Router",
