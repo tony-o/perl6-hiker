@@ -29,7 +29,7 @@ class Hiker {
     my $recurse = sub (*@m) {
       my @r;
       for @m -> $m {
-        @r.append($m) unless @ignore.grep($m) || ::($m.^name) !~~ any(Hiker::Route, Hiker::Model);
+        @r.append($m) unless @ignore.grep($m) || (::($m.^name) && ::($m.^name) !~~ any(Hiker::Route, Hiker::Model));
         try @r.append($recurse($m.WHO.values)) if $m.WHO.values.elems;
       }
       return @r.flat;
