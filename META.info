@@ -1,4 +1,5 @@
 {
+  "perl" : "6.*",
   "name" : "Hiker",
   "version" : "0.1.1",
   "description" : "MVC Framework built on HTTP::Server HTTP::Server::Router",
@@ -9,5 +10,6 @@
       "Hiker::Render": "lib/Hiker/Render.pm6",
       "Hiker::Model": "lib/Hiker/Model.pm6"
   },
+  "auth": "github:tony-o",
   "source-url" : "git://github.com/tony-o/perl6-hiker.git"
 }
