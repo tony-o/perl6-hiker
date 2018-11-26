@@ -77,7 +77,7 @@ This will create a boilerplate application for you in the current directory
 ```
 # perl6 app.pl6
 ```
-This will run your weapp in localhost:8080
+This will run your webapp in localhost:8080
 
 ## Request Flow
 
